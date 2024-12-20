@@ -1,0 +1,2 @@
+Arkhipov Ivan
+Python 3.10
