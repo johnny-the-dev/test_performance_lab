@@ -2,42 +2,57 @@ from sys import argv
 import json
 
 
-def set_value(test: dict, value_map: dict) -> None:
+def get_test_results_map() -> dict:
+    with open(argv[1]) as file:
+        values = json.load(file).get('values', [])
+
+    test_results_map = {}
+    for value in values:
+        test_results_map[value['id']] = value.get('value', 'no result')
+
+    return test_results_map
+
+
+def get_tests() -> list:
+    with open(argv[2]) as file:
+        tests = json.load(file).get('tests', [])
+
+    return tests
+
+
+def write_to_json(tests: list) -> None:
+    with open(argv[3], 'w') as output_file:
+        json.dump(tests, output_file)
+
+
+def set_value(test: dict, results_map: dict) -> None:
     if 'value' in test:
-        test['value'] = value_map.get(test['id'], 'no result')
+        test['value'] = results_map.get(test['id'], 'no result')
 
     if 'values' not in test:
         return
 
     for sub_test in test['values']:
-        set_value(sub_test, value_map)
+        set_value(sub_test, results_map)
 
 
 def main() -> None:
 
-    if len(argv) < 4:
+    if len(argv) != 4:
         print(
-            'Error: not enough arguments',
-            'Usage: python task3.py <values_json> <tests_json> <output_json>',
+            'Error: incorrect number of arguments',
+            'Usage: python task3.py <test_results_json> <test_cases_json> <output_json>',
             sep='\n'
         )
         return
 
-    with open(argv[1]) as values_file:
-        values_lst = json.load(values_file).get('values', [])
+    test_results_map = get_test_results_map()
+    test_cases = get_tests()
 
-    value_map = {}
-    for value in values_lst:
-        value_map[value['id']] = value.get('value', 'no result')
+    for test in test_cases:
+        set_value(test, test_results_map)
 
-    with open(argv[2]) as tests_file:
-        tests = json.load(tests_file).get('tests', [])
-
-    for test in tests:
-        set_value(test, value_map)
-
-    with open(argv[3], 'w') as output_file:
-        json.dump(tests, output_file)
+    write_to_json(test_cases)
 
 
 if __name__ == '__main__':

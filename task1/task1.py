@@ -1,21 +1,23 @@
 def main() -> None:
-    n, m = map(int, input().split())
+    num_digits, step_length = map(int, input().split())
 
-    if n == 1:
+    # if step_length <= 0:
+    #     print('The step length must be a positive number.')
+    #     return
+
+    if num_digits == 1:
         print(1)
+        return
 
-    nums = range(1, n + 1)
-    index_start = 0
-    num_path = ''
+    digits = list(range(1, num_digits + 1))
+    path = str(digits[0])
+    current_index = step_length % num_digits - 1
 
-    while True:
-        num_path += str(nums[index_start])
-        index_start = (index_start + m) % n - 1
+    while current_index != 0:
+        path += str(digits[current_index])
+        current_index = (current_index + step_length) % num_digits - 1
 
-        if index_start == 0:
-            break
-
-    print(num_path)
+    print(path)
 
 
 if __name__ == '__main__':
